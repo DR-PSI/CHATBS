@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEA CMMS Assistant</title>
+<style>
+  :root {
+    --mea-blue: #003087;
+    --mea-blue-dark: #00236b;
+    --mea-blue-light: #e8eef7;
+    --mea-gold: #c9a227;
+    --bg: #f4f6fa;
+    --surface: #ffffff;
+    --border: #dde3ed;
+    --text: #1a2236;
+    --text-2: #5a6478;
+    --text-3: #8a93a6;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 12px rgba(0,48,135,0.08);
+    --shadow-lg: 0 8px 32px rgba(0,48,135,0.14);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Sarabun', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── TOP NAV ── */
+  .nav {
+    background: var(--mea-blue);
+    padding: 0 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    text-decoration: none;
+  }
+  .nav-logo {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .nav-title { font-size: 15px; font-weight: 600; letter-spacing: 0.01em; }
+  .nav-sub { font-size: 11px; opacity: 0.65; margin-top: 1px; }
+  .nav-badge {
+    background: var(--mea-gold);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; flex: 1; }
+  .screen.active { display: flex; }
+
+  /* ── API KEY SCREEN ── */
+  #screen-key {
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .key-card {
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    padding: 40px 36px;
+    max-width: 440px;
+    width: 100%;
+    border: 1px solid var(--border);
+  }
+  .key-icon {
+    width: 56px;
+    height: 56px;
+    background: var(--mea-blue-light);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    margin-bottom: 20px;
+  }
+  .key-card h1 { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .key-card p { font-size: 14px; color: var(--text-2); line-height: 1.6; margin-bottom: 28px; }
+  .field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .key-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: 'Courier New', monospace;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color 0.15s;
+    margin-bottom: 16px;
+  }
+  .key-input:focus { border-color: var(--mea-blue); background: #fff; }
+  .key-btn {
+    width: 100%;
+    background: var(--mea-blue);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .key-btn:hover { background: var(--mea-blue-dark); }
+  .key-btn:active { transform: scale(0.99); }
+  .key-note {
+    margin-top: 16px;
+    font-size: 12px;
+    color: var(--text-3);
+    text-align: center;
+    line-height: 1.6;
+  }
+  .key-note a { color: var(--mea-blue); text-decoration: none; }
+
+  /* ── CHAT SCREEN ── */
+  #screen-chat {
+    flex-direction: column;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 16px 16px 0;
+    gap: 0;
+  }
+
+  /* Module selector */
+  .module-bar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 10px 0 12px;
+    flex-shrink: 0;
+  }
+  .mod-chip {
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .mod-chip:hover { border-color: var(--mea-blue); color: var(--mea-blue); }
+  .mod-chip.active { background: var(--mea-blue); color: #fff; border-color: var(--mea-blue); }
+
+  /* Chat box */
+  .chat-box {
+    flex: 1;
+    background: var(--surface);
+    border-radius: 16px 16px 0 0;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    scroll-behavior: smooth;
+  }
+  .chat-messages::-webkit-scrollbar { width: 4px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  /* Messages */
+  .msg-row { display: flex; gap: 10px; align-items: flex-start; }
+  .msg-row.user { flex-direction: row-reverse; }
+
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .avatar.bot { background: var(--mea-blue); color: #fff; }
+  .avatar.user { background: #e0e7f4; color: var(--mea-blue); }
+
+  .bubble {
+    max-width: calc(100% - 100px);
+    padding: 12px 16px;
+    font-size: 14px;
+    line-height: 1.75;
+    position: relative;
+  }
+  .msg-row.bot .bubble {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px 14px 14px 14px;
+    color: var(--text);
+  }
+  .msg-row.user .bubble {
+    background: var(--mea-blue);
+    border-radius: 14px 4px 14px 14px;
+    color: #fff;
+  }
+
+  .source-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--mea-blue);
+    background: var(--mea-blue-light);
+    padding: 3px 8px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Quick replies */
+  .quick-replies { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .qr-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+    border: 1.5px solid var(--mea-blue);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--mea-blue);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .qr-btn:hover { background: var(--mea-blue); color: #fff; }
+
+  /* Typing indicator */
+  .typing-dots { display: flex; gap: 4px; padding: 4px 2px; align-items: center; }
+  .typing-dots span {
+    width: 7px; height: 7px;
+    background: var(--text-3);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:scale(0.7);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+
+  /* Input bar */
+  .input-bar {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    background: var(--surface);
+  }
+  .input-bar textarea {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    resize: none;
+    max-height: 120px;
+    transition: border-color 0.15s;
+    line-height: 1.5;
+  }
+  .input-bar textarea:focus { border-color: var(--mea-blue); background: #fff; }
+  .input-bar textarea::placeholder { color: var(--text-3); }
+  .send-btn {
+    width: 42px;
+    height: 42px;
+    background: var(--mea-blue);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.1s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { background: var(--mea-blue-dark); }
+  .send-btn:active { transform: scale(0.95); }
+  .send-btn:disabled { opacity: 0.4; cursor: default; }
+  .send-btn svg { width: 18px; height: 18px; }
+
+  /* Footer bar */
+  .footer-bar {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    max-width: 800px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .footer-bar span { font-size: 11px; color: var(--text-3); }
+  .logout-btn {
+    font-size: 11px;
+    color: var(--text-3);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .logout-btn:hover { color: #c0392b; background: #fdf0ee; }
+
+  /* Error toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #c0392b;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.25s;
+    z-index: 999;
+    max-width: 320px;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="nav-logo">⚡</div>
+    <div>
+      <div class="nav-title">MEA CMMS Assistant</div>
+      <div class="nav-sub">ระบบบำรุงรักษา Maximo | การไฟฟ้านครหลวง</div>
+    </div>
+  </div>
+  <div class="nav-badge">AI</div>
+</nav>
+
+<!-- SCREEN 1: API KEY -->
+<main class="screen active" id="screen-key">
+  <div class="key-card">
+    <div class="key-icon">🔑</div>
+    <h1>เข้าสู่ระบบ</h1>
+
+    <input type="password" class="key-input" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="new-password" />
+    <button class="key-btn" onclick="submitKey()">เริ่มใช้งาน →</button>
+
+  </div>
+</main>
+
+<!-- SCREEN 2: CHAT -->
+<main class="screen" id="screen-chat">
+  <div class="module-bar" id="moduleBar">
+    <button class="mod-chip active" data-module="auto" onclick="selectModule(this)">🔍 อัตโนมัติ</button>
+    <button class="mod-chip" data-module="work_order" onclick="selectModule(this)">📋 Work Order</button>
+    <button class="mod-chip" data-module="inventory" onclick="selectModule(this)">📦 Inventory</button>
+    <button class="mod-chip" data-module="asset" onclick="selectModule(this)">🏭 Asset</button>
+    <button class="mod-chip" data-module="service_request" onclick="selectModule(this)">🔧 Service Request</button>
+    <button class="mod-chip" data-module="approve" onclick="selectModule(this)">✅ การอนุมัติ</button>
+    <button class="mod-chip" data-module="labor" onclick="selectModule(this)">⏱ Labor Sheet</button>
+    <button class="mod-chip" data-module="job_plan" onclick="selectModule(this)">📅 Job Plan/PM</button>
+  </div>
+
+  <div class="chat-box">
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg-row bot">
+        <div class="avatar bot">M</div>
+        <div>
+          <div class="bubble">
+            สวัสดีครับ ผมคือ <strong>MEA CMMS Assistant</strong><br>
+            พร้อมช่วยตอบคำถามเกี่ยวกับการใช้งานระบบ Maximo ของ กฟน. ครับ
+            <div class="quick-replies">
+              <button class="qr-btn" onclick="sendQuestion('วิธีสร้าง Work Order ทำอย่างไร?')">สร้าง Work Order</button>
+              <button class="qr-btn" onclick="sendQuestion('วิธีเบิกวัสดุ Inventory ทำอย่างไร?')">เบิก Inventory</button>
+              <button class="qr-btn" onclick="sendQuestion('วิธีลงทะเบียน Asset ใหม่ทำอย่างไร?')">ลงทะเบียน Asset</button>
+              <button class="qr-btn" onclick="sendQuestion('ขั้นตอนการอนุมัติในระบบ CMMS มีอะไรบ้าง?')">ขั้นตอนอนุมัติ</button>
+              <button class="qr-btn" onclick="sendQuestion('วิธีบันทึก Labor Sheet ทำอย่างไร?')">บันทึก Labor</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="input-bar">
+      <textarea id="msgInput" placeholder="พิมพ์คำถามเกี่ยวกับ CMMS..." rows="1"
+        onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMsg()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"></line>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+      </button>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER (only in chat) -->
+<div class="footer-bar" id="footerBar" style="display:none">
+  <span>📄 คู่มือ Maximo v2.00 | กฟน. CMMS</span>
+  <button class="logout-btn" onclick="logout()">เปลี่ยน API Key</button>
+</div>
+
+<!-- ERROR TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const REPO = 'https://raw.githubusercontent.com/DR-PSI/CHATBS/main/';
+
+const PDF_FILES = {
+  work_order:      'UM_Work%20Order%20Tracking_V01.00.pdf',
+  work_shift:      'UM_Work%20Shift_V01.00.pdf',
+  work_execution:  'UM_Work%20Execution%20App%20for%20Tablet_V02.00.pdf',
+  service_request: 'UM_Service%20Request_V01.00.pdf',
+  asset:           'UM_Asset%20Management_V02.00.pdf',
+  asset_location:  'UM_Asset%20Location%20Registration%20%E0%B8%9D%E0%B8%9A%E0%B8%A3._V02.00.pdf',
+  inventory:       'UM_Inventory%20Management_V01.00.pdf',
+  inventory_transfer: 'UM_Inventory%20Transfer_V01.00.pdf',
+  inventory_usage: 'UM_Inventory%20Usage_V01.00.pdf',
+  material_uninstall: 'UM_Material%20Uninstall_V01.00.pdf',
+  tools:           'UM_Tools%20Inventory%20Usage_V01.00.pdf',
+  labor:           'UM_%E0%B8%9A%E0%B8%B1%E0%B8%99%E0%B8%97%E0%B8%B6%E0%B8%81%E0%B8%8A%E0%B8%B1%E0%B9%88%E0%B8%A7%E0%B9%82%E0%B8%A1%E0%B8%87%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%97%E0%B8%B3%E0%B8%87%E0%B8%B2%E0%B8%99%20(Labor%20Sheet)%20V2.00.pdf',
+  approve:         'UM_%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%A3%E0%B8%A7%E0%B8%A1%E0%B8%81%E0%B8%A3%E0%B8%B0%E0%B8%9A%E0%B8%A7%E0%B8%99%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B8%AD%E0%B8%99%E0%B8%B8%E0%B8%A1%E0%B8%B1%E0%B8%95%E0%B8%B4%E0%B9%83%E0%B8%99%E0%B8%A3%E0%B8%B0%E0%B8%9A%E0%B8%9A%20CMMS_V01.00.pdf',
+  job_plan:        'UM-Job%20Plan-Route-PM_V01.00.pdf',
+  resources:       'UM_Resources_Master%20Data-Work%20Center-Labor_V01.00.pdf',
+};
+
+const MODULE_LABELS = {
+  work_order: 'Work Order Tracking', work_shift: 'Work Shift',
+  work_execution: 'Work Execution (Tablet)', service_request: 'Service Request',
+  asset: 'Asset Management', asset_location: 'Asset Location',
+  inventory: 'Inventory Management', inventory_transfer: 'Inventory Transfer',
+  inventory_usage: 'Inventory Usage', material_uninstall: 'Material Uninstall',
+  tools: 'Tools Inventory', labor: 'Labor Sheet',
+  approve: 'การอนุมัติ CMMS', job_plan: 'Job Plan / PM', resources: 'Resources Master Data',
+};
+
+const KEYWORD_MAP = {
+  'work order': 'work_order', 'ใบสั่งงาน': 'work_order', 'สั่งงาน': 'work_order', 'workorder': 'work_order',
+  'work shift': 'work_shift', 'กะ': 'work_shift',
+  'tablet': 'work_execution', 'แท็บเล็ต': 'work_execution',
+  'service request': 'service_request', 'แจ้งซ่อม': 'service_request', 'sr': 'service_request',
+  'asset management': 'asset', 'ทรัพย์สิน': 'asset', 'ครุภัณฑ์': 'asset', 'อุปกรณ์': 'asset',
+  'asset location': 'asset_location', 'location': 'asset_location',
+  'inventory management': 'inventory', 'คลังพัสดุ': 'inventory', 'stock': 'inventory',
+  'โอนย้าย': 'inventory_transfer', 'transfer': 'inventory_transfer',
+  'เบิก': 'inventory_usage', 'inventory usage': 'inventory_usage',
+  'ถอด': 'material_uninstall', 'uninstall': 'material_uninstall',
+  'เครื่องมือ': 'tools', 'tools': 'tools', 'อุปกรณ์ช่าง': 'tools',
+  'labor': 'labor', 'ชั่วโมงทำงาน': 'labor', 'labor sheet': 'labor', 'บันทึกชั่วโมง': 'labor',
+  'อนุมัติ': 'approve', 'approve': 'approve', 'approval': 'approve',
+  'job plan': 'job_plan', 'pm': 'job_plan', 'preventive': 'job_plan', 'แผนงาน': 'job_plan',
+  'resources': 'resources', 'work center': 'resources', 'labor master': 'resources',
+};
+
+let selectedModule = 'auto';
+let apiKey = '';
+let busy = false;
+const pdfCache = {};
+
+// ── INIT ──
+window.onload = () => {
+  const saved = sessionStorage.getItem('mea_api_key');
+  if (saved) { apiKey = saved; showChat(); }
+  document.getElementById('apiKeyInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitKey();
+  });
+};
+
+function submitKey() {
+  const val = document.getElementById('apiKeyInput').value.trim();
+  if (!val.startsWith('sk-ant-')) { showToast('API Key ไม่ถูกต้อง — ต้องขึ้นต้นด้วย sk-ant-'); return; }
+  apiKey = val;
+  sessionStorage.setItem('mea_api_key', val);
+  showChat();
+}
+
+function showChat() {
+  document.getElementById('screen-key').classList.remove('active');
+  document.getElementById('screen-chat').classList.add('active');
+  document.getElementById('footerBar').style.display = 'flex';
+}
+
+function logout() {
+  sessionStorage.removeItem('mea_api_key');
+  apiKey = '';
+  document.getElementById('screen-chat').classList.remove('active');
+  document.getElementById('screen-key').classList.add('active');
+  document.getElementById('footerBar').style.display = 'none';
+  document.getElementById('apiKeyInput').value = '';
+}
+
+function selectModule(el) {
+  document.querySelectorAll('.mod-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  selectedModule = el.dataset.module;
+}
+
+function detectModule(q) {
+  const lower = q.toLowerCase();
+  for (const [kw, mod] of Object.entries(KEYWORD_MAP)) {
+    if (lower.includes(kw)) return mod;
+  }
+  return 'work_order';
+}
+
+async function loadPdf(module) {
+  if (pdfCache[module]) return pdfCache[module];
+  const file = PDF_FILES[module];
+  const resp = await fetch(REPO + file);
+  if (!resp.ok) throw new Error(`โหลด PDF ไม่ได้ (${module})`);
+  const blob = await resp.blob();
+  const base64 = await new Promise(res => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.readAsDataURL(blob);
+  });
+  pdfCache[module] = base64;
+  return base64;
+}
+
+function addMessage(role, html, label) {
+  const wrap = document.getElementById('chatMessages');
+  const row = document.createElement('div');
+  row.className = `msg-row ${role}`;
+  const av = role === 'bot' ? '<div class="avatar bot">M</div>' : '<div class="avatar user">U</div>';
+  const tag = label ? `<div class="source-tag">📄 ${label}</div>` : '';
+  row.innerHTML = `${av}<div>${tag}<div class="bubble">${html}</div></div>`;
+  wrap.appendChild(row);
+  wrap.scrollTop = wrap.scrollHeight;
+  return row;
+}
+
+function addTyping() {
+  const wrap = document.getElementById('chatMessages');
+  const row = document.createElement('div');
+  row.className = 'msg-row bot'; row.id = 'typing-row';
+  row.innerHTML = `<div class="avatar bot">M</div><div><div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>`;
+  wrap.appendChild(row);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function removeTyping() { document.getElementById('typing-row')?.remove(); }
+
+async function sendQuestion(q) { await doSend(q); }
+
+async function sendMsg() {
+  const ta = document.getElementById('msgInput');
+  const q = ta.value.trim();
+  if (!q || busy) return;
+  ta.value = ''; ta.style.height = '';
+  await doSend(q);
+}
+
+async function doSend(q) {
+  if (busy) return;
+  busy = true;
+  document.getElementById('sendBtn').disabled = true;
+  addMessage('user', escHtml(q), null);
+  addTyping();
+
+  try {
+    const mod = selectedModule === 'auto' ? detectModule(q) : selectedModule;
+    const base64 = await loadPdf(mod);
+    const label = MODULE_LABELS[mod] || mod;
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1024,
+        system: `คุณคือผู้ช่วยตอบคำถามคู่มือการใช้งานระบบ CMMS (IBM Maximo) ของการไฟฟ้านครหลวง (MEA)
+ตอบเป็นภาษาไทยเสมอ ตอบกระชับและชัดเจน อ้างอิงเนื้อหาจาก PDF ที่ให้มาเท่านั้น
+ถ้าไม่พบข้อมูลในเอกสาร ให้ตอบว่า "ไม่พบข้อมูลนี้ในคู่มือ ${label}" อย่าคาดเดา
+ถ้ามีขั้นตอน ให้แสดงเป็นข้อ 1. 2. 3. ตามลำดับ`,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } },
+            { type: 'text', text: q }
+          ]
+        }]
+      })
+    });
+
+    const data = await resp.json();
+    removeTyping();
+
+    if (data.error) { showToast('API Error: ' + data.error.message); busy = false; document.getElementById('sendBtn').disabled = false; return; }
+
+    const answer = data.content?.[0]?.text || 'ไม่สามารถตอบได้';
+    addMessage('bot', formatAnswer(answer), label);
+  } catch (err) {
+    removeTyping();
+    showToast('เกิดข้อผิดพลาด: ' + err.message);
+  }
+
+  busy = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function formatAnswer(text) {
+  return text
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n(\d+\. )/g, '<br><strong>$1</strong>')
+    .replace(/\n- /g, '<br>• ')
+    .replace(/\n/g, '<br>');
+}
+
+function escHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+}
+
+function autoResize(ta) {
+  ta.style.height = '';
+  ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4000);
+}
+</script>
+</body>
+</html>
