@@ -227,7 +227,7 @@
   .avatar.user { background: #e0e7f4; color: var(--mea-blue); }
 
   .bubble {
-    max-width: calc(100% - 100px);
+    max-width: 520px;
     padding: 12px 16px;
     font-size: 14px;
     line-height: 1.75;
@@ -261,16 +261,17 @@
   }
 
   /* Quick replies */
-  .quick-replies { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; max-width: 480px; }
   .qr-btn {
-    font-size: 12px;
-    padding: 6px 12px;
+    font-size: 13px;
+    padding: 7px 14px;
     border: 1.5px solid var(--mea-blue);
     border-radius: 20px;
     background: transparent;
     color: var(--mea-blue);
     cursor: pointer;
     transition: all 0.15s;
+    white-space: nowrap;
   }
   .qr-btn:hover { background: var(--mea-blue); color: #fff; }
 
