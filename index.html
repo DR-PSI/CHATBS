@@ -209,8 +209,8 @@
   .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
   /* Messages */
-  .msg-row { display: flex; gap: 10px; align-items: flex-start; }
-  .msg-row.user { flex-direction: row-reverse; }
+  .msg-row { display: flex; gap: 10px; align-items: flex-start; overflow: visible; }
+  .msg-row.user { flex-direction: row-reverse; justify-content: flex-start; }
 
   .avatar {
     width: 32px;
@@ -243,6 +243,9 @@
     background: var(--mea-blue);
     border-radius: 14px 4px 14px 14px;
     color: #fff;
+    max-width: 520px;
+    word-break: break-word;
+    white-space: pre-wrap;
   }
 
   .source-tag {
