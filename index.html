@@ -221,7 +221,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 10px;
     font-weight: 700;
     flex-shrink: 0;
   }
@@ -391,7 +391,7 @@
     <div class="nav-logo">⚡</div>
     <div>
       <div class="nav-title">MEA CMMS Assistant</div>
-      <div class="nav-sub">ระบบบำรุงรักษา Maximo | การไฟฟ้านครหลวง</div>
+      <div class="nav-sub">Asset Management | การไฟฟ้านครหลวง</div>
     </div>
   </div>
   <div class="nav-badge">AI</div>
@@ -425,7 +425,7 @@
   <div class="chat-box">
     <div class="chat-messages" id="chatMessages">
       <div class="msg-row bot">
-        <div class="avatar bot">M</div>
+        <div class="avatar bot">AI</div>
         <div class="bubble-wrap">
           <div class="bubble">
             สวัสดีครับ ผมคือ <strong>MEA CMMS Assistant</strong><br>
@@ -582,7 +582,7 @@ function addMessage(role, html, label) {
   const wrap = document.getElementById('chatMessages');
   const row = document.createElement('div');
   row.className = `msg-row ${role}`;
-  const av = role === 'bot' ? '<div class="avatar bot">M</div>' : '<div class="avatar user">U</div>';
+  const av = role === 'bot' ? '<div class="avatar bot">AI</div>' : '<div class="avatar user">ME</div>';
   const tag = label ? `<div class="source-tag">📄 ${label}</div>` : '';
   row.innerHTML = `${av}<div class="bubble-wrap">${tag}<div class="bubble">${html}</div></div>`;
   wrap.appendChild(row);
@@ -594,7 +594,7 @@ function addTyping() {
   const wrap = document.getElementById('chatMessages');
   const row = document.createElement('div');
   row.className = 'msg-row bot'; row.id = 'typing-row';
-  row.innerHTML = `<div class="avatar bot">M</div><div class="bubble-wrap"><div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>`;
+  row.innerHTML = `<div class="avatar bot">AI</div><div class="bubble-wrap"><div class="bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div></div>`;
   wrap.appendChild(row);
   wrap.scrollTop = wrap.scrollHeight;
 }
